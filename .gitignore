@@ -1,0 +1,4 @@
+misc
+.terraform
+provider.tf
+variables.tf
