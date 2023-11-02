@@ -7,7 +7,7 @@
 # FETCH MANUALLY CREATED KONG DB USER PASSWORD
 # ******************************************************************************
 data "google_secret_manager_secret_version" "kong-db-password" {
-  secret   = "kong-db-password"
+  secret = var.secret_name
 }
 
 # ******************************************************************************
@@ -82,9 +82,9 @@ resource "google_service_account" "kong" {
 }
 
 resource "google_project_iam_member" "kong" {
-  project  = var.project_id
-  role     = "roles/cloudsql.client"
-  member   = google_service_account.kong.member
+  project = var.project_id
+  role    = "roles/cloudsql.client"
+  member  = google_service_account.kong.member
 }
 
 # ******************************************************************************
@@ -123,7 +123,7 @@ resource "google_compute_managed_ssl_certificate" "kong" {
 # ******************************************************************************
 
 resource "google_compute_instance_template" "kong_eu_west4" {
-  name     = "kong-eu-west4-template"
+  name = "kong-eu-west4-template"
   disk {
     auto_delete  = true
     boot         = true
@@ -183,7 +183,7 @@ resource "google_compute_instance_template" "kong_eu_west4" {
 }
 
 resource "google_compute_instance_template" "kong_eu_west1" {
-  name     = "kong-eu-west1-template"
+  name = "kong-eu-west1-template"
   disk {
     auto_delete  = true
     boot         = true
@@ -248,9 +248,9 @@ resource "google_compute_instance_template" "kong_eu_west1" {
 # ******************************************************************************
 
 resource "google_compute_region_autoscaler" "kong_eu_west4_autoscaler" {
-  name     = "kong-eu-west4-autoscaler"
-  region   = "europe-west4"
-  target   = google_compute_region_instance_group_manager.kong_eu_west4.id
+  name   = "kong-eu-west4-autoscaler"
+  region = "europe-west4"
+  target = google_compute_region_instance_group_manager.kong_eu_west4.id
 
   autoscaling_policy {
     max_replicas    = 4
@@ -264,9 +264,9 @@ resource "google_compute_region_autoscaler" "kong_eu_west4_autoscaler" {
 }
 
 resource "google_compute_region_autoscaler" "kong_eu_west1_autoscaler" {
-  name     = "kong-eu-west1-autoscaler"
-  region   = "europe-west1"
-  target   = google_compute_region_instance_group_manager.kong_eu_west1.id
+  name   = "kong-eu-west1-autoscaler"
+  region = "europe-west1"
+  target = google_compute_region_instance_group_manager.kong_eu_west1.id
 
   autoscaling_policy {
     max_replicas    = 4
@@ -284,8 +284,8 @@ resource "google_compute_region_autoscaler" "kong_eu_west1_autoscaler" {
 # ******************************************************************************
 
 resource "google_compute_region_instance_group_manager" "kong_eu_west4" {
-  name     = "kong-eu-west4-instance-group-manager"
-  region   = "europe-west4"
+  name   = "kong-eu-west4-instance-group-manager"
+  region = "europe-west4"
   named_port {
     name = "client"
     port = 8000
@@ -302,8 +302,8 @@ resource "google_compute_region_instance_group_manager" "kong_eu_west4" {
 }
 
 resource "google_compute_region_instance_group_manager" "kong_eu_west1" {
-  name     = "kong-eu-west1-instance-group-manager"
-  region   = "europe-west1"
+  name   = "kong-eu-west1-instance-group-manager"
+  region = "europe-west1"
   named_port {
     name = "client"
     port = 8000
@@ -451,7 +451,7 @@ resource "google_compute_url_map" "kong_https_redirect" {
 }
 
 resource "google_compute_network" "network" {
-  name = "baas-testing-network"
+  name                    = "baas-testing-network"
   auto_create_subnetworks = false
 }
 
@@ -472,8 +472,8 @@ resource "google_compute_subnetwork" "subnetwork02" {
 module "router" {
   for_each = var.routers
 
-  source   = "terraform-google-modules/cloud-router/google"
-  version  = "~> 6.0"
+  source  = "terraform-google-modules/cloud-router/google"
+  version = "~> 6.0"
 
   name    = "router"
   project = var.project_id
@@ -481,7 +481,7 @@ module "router" {
   network = google_compute_network.network.name
   nats = [
     {
-      "name" = "${each.key}-nat",
+      "name"                               = "${each.key}-nat",
       "source_subnetwork_ip_ranges_to_nat" = "LIST_OF_SUBNETWORKS"
       "subnetworks" = [
         for subnet in each.value.subnets :
