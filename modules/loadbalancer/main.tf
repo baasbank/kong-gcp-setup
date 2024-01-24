@@ -64,7 +64,7 @@ resource "google_compute_target_https_proxy" "https" {
 
 resource "google_dns_record_set" "dns" {
   project      = var.project
-  name         = "baas.test.caas.selling.ingka.com."
+  name         = "baas.example.com."
   type         = "A"
   ttl          = 60
   managed_zone = "test"
